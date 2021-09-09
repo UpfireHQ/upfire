@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Upfire</title>
+    <script>
+      (function() {
+        if (!process.env.HOT) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = './dist/style.css';
+          // HACK: Writing the script path should be done with webpack
+          document.getElementsByTagName('head')[0].appendChild(link);
+        }
+      })();
+    </script>
+    <style>
+      @keyframes example {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .introduction-screen {
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+        height: calc(115vh - 70px);
+        position: fixed;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #E9ECF1;
+        animation-name: example;
+        animation-duration: 1s;
+        animation-iteration-count: infinite;
+      }
+
+      .introduction-screen > introduction-logo {
+        width: 30%;
+      }
+    </style>
+    <style>
+      ::selection {
+        background: transparent; /* WebKit/Blink Browsers */
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <div class="introduction-screen" id="introduction-screen">
+      <svg
+        width="128"
+        height="128"
+        viewBox="0 0 87 87"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M43.8 86.6C67.4378 86.6 86.6 67.4378 86.6 43.8C86.6 20.1622 67.4378 1 43.8 1C20.1622 1 1 20.1622 1 43.8C1 67.4378 20.1622 86.6 43.8 86.6Z"
+          fill="url(#paint0_linear)"
+        />
+        <path
+          d="M43.8 86.6C67.4378 86.6 86.6 67.4378 86.6 43.8C86.6 20.1622 67.4378 1 43.8 1C20.1622 1 1 20.1622 1 43.8C1 67.4378 20.1622 86.6 43.8 86.6Z"
+          stroke="url(#paint1_linear)"
+          stroke-width="0.5448"
+          stroke-miterlimit="10"
+        />
+        <path
+          d="M71.3 43.7C71.3 36.7 68.6 30.2 64.2 25.4C64.3 26.3 64.3 27.2 64.3 28.1C64.3 37.6 59.1 45.9 51.4 50.3C53.5 46.6 54.7 42.4 54.7 37.8C54.7 34.6 54.1 31.5 53 28.7C49.2 18.7 36.9 15.4 28.2 21.6C21.4 26.5 16.9 34.6 16.9 43.6C16.9 50.6 19.6 57.1 24 61.9C23.9 61 23.9 60.1 23.9 59.2C23.9 49.7 29.1 41.4 36.8 37C34.7 40.7 33.5 44.9 33.5 49.5C33.5 52.7 34.1 55.8 35.2 58.7C39 68.6 51.2 71.9 59.9 65.7C66.8 60.8 71.3 52.8 71.3 43.7Z"
+          fill="url(#paint2_linear)"
+        />
+        <defs>
+          <linearGradient
+            id="paint0_linear"
+            x1="43.8491"
+            y1="73.977"
+            x2="43.8491"
+            y2="-97.8276"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop stop-color="#0060AF" />
+            <stop offset="0.0467092" stop-color="#0263B5" />
+            <stop offset="0.406" stop-color="#1375DB" />
+            <stop offset="0.694" stop-color="#1D80F2" />
+            <stop offset="0.8732" stop-color="#2184FB" />
+          </linearGradient>
+          <linearGradient
+            id="paint1_linear"
+            x1="43.8491"
+            y1="86.8103"
+            x2="43.8491"
+            y2="0.754799"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0.2697" stop-color="#2184FB" />
+            <stop offset="0.392" stop-color="#1F89FA" />
+            <stop offset="0.5432" stop-color="#1B98F9" />
+            <stop offset="0.7096" stop-color="#13B2F6" />
+            <stop offset="0.8857" stop-color="#08D4F2" />
+            <stop offset="1" stop-color="#00EFEF" />
+          </linearGradient>
+          <linearGradient
+            id="paint2_linear"
+            x1="44.1294"
+            y1="18.6671"
+            x2="44.1294"
+            y2="86.5384"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop stop-color="#00D9E8" />
+            <stop offset="0.1967" stop-color="#01D5E9" />
+            <stop offset="0.3804" stop-color="#06CAEB" />
+            <stop offset="0.559" stop-color="#0DB7F0" />
+            <stop offset="0.7333" stop-color="#179DF5" />
+            <stop offset="0.8625" stop-color="#2184FB" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <script>
+      {
+        const scripts = [];
+
+        // Dynamically insert the DLL script in development env in the
+        // renderer process
+        if (process.env.NODE_ENV === 'development') {
+          scripts.push('../dll/renderer.dev.dll.js');
+        }
+
+        // Dynamically insert the bundled app script in the renderer process
+        const port = process.env.PORT || 1212;
+        scripts.push(
+          process.env.HOT
+            ? 'http://localhost:' + port + '/dist/renderer.dev.js'
+            : './dist/renderer.prod.js'
+        );
+
+        document.write(
+          scripts
+            .map(script => `<script defer src="${script}"><\/script>`)
+            .join('')
+        );
+      }
+    </script>
+  </body>
+</html>
