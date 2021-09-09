@@ -1,0 +1,247 @@
+/*
+ * @NOTE: Prepend a `~` to css file paths that are in your node_modules
+ *        See https://github.com/webpack-contrib/sass-loader#imports
+ */
+// @import '~@fortawesome/fontawesome-free/css/all.css';
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+
+@font-face {
+  font-family: 'icomoon';
+  src: url('style/fonts/icomoon/icomoon.eot?t6nep4');
+  src: url('style/fonts/icomoon/icomoon.eot?t6nep4#iefix') format('embedded-opentype'),
+  url('style/fonts/icomoon/icomoon.ttf?t6nep4') format('truetype'),
+  url('style/fonts/icomoon/icomoon.woff?t6nep4') format('woff'),
+  url('style/fonts/icomoon/icomoon.svg?t6nep4#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@import url('style/fonts/icomoon/style.css');
+
+* {
+  margin: 0;
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  min-width: 950px;
+  font-size: 14px;
+  font-family: 'Roboto', serif;
+  font-weight: normal;
+  background: #E9ECF1;
+  color: #7e7d7d;
+  min-height: 100%;
+}
+
+.addwallet .sc-jqCOkK {
+  margin-bottom: 15px;
+  background-color: #F5F9FF;
+  border: 1.16586px solid #CADFFF;
+  color: #344971;
+}
+
+.editwallet .sc-jqCOkK {
+  margin-bottom: 20px;
+}
+
+body {
+  position: relative;
+  font-weight: normal;
+}
+
+button {
+  outline: none;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.pac-container {
+  z-index: 2000 !important;
+}
+
+.fileinput-button {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  white-space: inherit;
+
+  input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    z-index: 1;
+    opacity: 0;
+    -ms-filter: 'alpha(opacity=0)';
+    font-size: 200px;
+    direction: ltr;
+    cursor: pointer;
+  }
+}
+
+a {
+  text-decoration: none;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5F9FF;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #BABABA;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #808080;
+}
+
+#root,
+#root > div {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Progress bar */
+
+.sk-cube-grid {
+  width: 40px;
+  height: 40px;
+  margin: 2em auto;
+}
+
+.sk-cube-grid .sk-cube {
+  width: 33%;
+  height: 33%;
+  background-color: #FF5B87;
+  float: left;
+  -webkit-animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out;
+  animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out;
+}
+
+.sk-cube-grid .sk-cube1 {
+  -webkit-animation-delay: 0.2s;
+  animation-delay: 0.2s;
+}
+
+.sk-cube-grid .sk-cube2 {
+  -webkit-animation-delay: 0.3s;
+  animation-delay: 0.3s;
+}
+
+.sk-cube-grid .sk-cube3 {
+  -webkit-animation-delay: 0.4s;
+  animation-delay: 0.4s;
+}
+
+.sk-cube-grid .sk-cube4 {
+  -webkit-animation-delay: 0.1s;
+  animation-delay: 0.1s;
+}
+
+.sk-cube-grid .sk-cube5 {
+  -webkit-animation-delay: 0.2s;
+  animation-delay: 0.2s;
+}
+
+.sk-cube-grid .sk-cube6 {
+  -webkit-animation-delay: 0.3s;
+  animation-delay: 0.3s;
+}
+
+.sk-cube-grid .sk-cube7 {
+  -webkit-animation-delay: 0s;
+  animation-delay: 0s;
+}
+
+.sk-cube-grid .sk-cube8 {
+  -webkit-animation-delay: 0.1s;
+  animation-delay: 0.1s;
+}
+
+.sk-cube-grid .sk-cube9 {
+  -webkit-animation-delay: 0.2s;
+  animation-delay: 0.2s;
+}
+
+@-webkit-keyframes sk-cubeGridScaleDelay {
+  0%,
+  70%,
+  100% {
+    -webkit-transform: scale3D(1, 1, 1);
+    transform: scale3D(1, 1, 1);
+  }
+  35% {
+    -webkit-transform: scale3D(0, 0, 1);
+    transform: scale3D(0, 0, 1);
+  }
+}
+
+@keyframes sk-cubeGridScaleDelay {
+  0%,
+  70%,
+  100% {
+    -webkit-transform: scale3D(1, 1, 1);
+    transform: scale3D(1, 1, 1);
+  }
+  35% {
+    -webkit-transform: scale3D(0, 0, 1);
+    transform: scale3D(0, 0, 1);
+  }
+}
+
+/* amcharts */
+
+.amcharts-chart-div {
+  padding: 1em 0 !important;
+  width: 100% !important;
+}
+
+.amcharts-chart-div > svg {
+}
+
+#amcharts-chart-div > svg {
+  padding: 0.5em !important;
+}
+
+.amcharts-chart-div > a {
+  display: none !important;
+}
+
+.amcharts-axis-label {
+  /*fill: #585b76;*/
+}
+
+.amcharts-axis-label tspan {
+  /*font-size: 9px;*/
+  font-weight: bold;
+}
+
+.amcharts-axis-line {
+  /*stroke: #acaccc;*/
+}
+
+.amcharts-axis-grid {
+  /*stroke: #acaccc;*/
+}
+
+.amcharts-axis-zero-grid {
+  display: none;
+}
