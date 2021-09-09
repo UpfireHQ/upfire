@@ -1,0 +1,10 @@
+{
+  "tokenContract": "0xF5EceA3dc60C638eEF6D071F8c579587318331b3",
+  "upfiringContract": "0xE6982aD9d200e44D1185866b15486262596912f7",
+  "upfiringStoreContract": "0xC5814D245BaD1f2a0Ae76E125096250F1704FbE0",
+  "ufrTokenContract": "0x38D32aCfc73c2125836F78f9547a01bE473b30B4",
+  "uprSwapContract": "0x83F027962F43e090724a7858e066111e0070CB8E",
+  "etherscanUrl": "https://testnet.bscscan.com",
+  "providerUrl": "https://data-seed-prebsc-1-s1.binance.org:8545",
+  "minters": []
+}

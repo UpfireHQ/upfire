@@ -1,0 +1,9 @@
+{
+  "tokenContract": "",
+  "upfiringContract": "",
+  "uprStakingContract": "",
+  "ufrTokenContract": "",
+  "uprSwapContract": "",
+  "providerUrl": "https://mainnet.infura.io",
+  "etherscanUrl": "https://etherscan.io"
+}
