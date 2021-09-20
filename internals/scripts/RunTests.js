@@ -1,5 +1,5 @@
-import spawn from 'cross-spawn';
-import path from 'path';
+const spawn = require('cross-spawn');
+const path = require('path');
 
 const pattern =
   process.argv[2] === 'e2e'

@@ -2,14 +2,14 @@
  * Base webpack config used across other specific configs
  */
 
-import path from 'path';
-import webpack from 'webpack';
-import fs from 'fs';
-import { dependencies as externals } from './app/package.json';
-import { dependencies as possibleExternals } from './package.json';
+const path = require('path');
+const webpack = require('webpack');
+const fs = require('fs');
+const { dependencies: externals } = require('./app/package.json');
+const { dependencies: possibleExternals } = require('./package.json');
 
 // Find all the dependencies without a `main` property and add them as webpack externals
-function filterDepWithoutEntryPoints(dep: string): boolean {
+function filterDepWithoutEntryPoints(dep) {
   // Return true if we want to add a dependency to externals
   try {
     // If the root of the dependency has an index.js, return true
@@ -28,7 +28,7 @@ function filterDepWithoutEntryPoints(dep: string): boolean {
   }
 }
 
-export default {
+module.exports = {
   externals: [
     ...Object.keys(externals || {}),
     ...Object.keys(possibleExternals || {}).filter(filterDepWithoutEntryPoints)
