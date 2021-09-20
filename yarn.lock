@@ -894,6 +894,11 @@ alphanum-sort@^1.0.0:
   resolved "https://registry.npmjs.org/alphanum-sort/-/alphanum-sort-1.0.2.tgz"
   integrity sha1-l6ERlkmyEa0zaR2fn0hqjsn74KM=
 
+amcharts3@^3.21.14:
+  version "3.21.15"
+  resolved "https://registry.yarnpkg.com/amcharts3/-/amcharts3-3.21.15.tgz#1a8036c85da8e5248b23b5ca9875e42af058f028"
+  integrity sha512-t7/RA0iuDXN2QAneUThW87DbCnSUBYFWxSr2Hsd/+sPvfG0aqeUXEFpqsozcEl2y2XgCEQJ4jMaZ1X/CoYArGA==
+
 amdefine@>=0.0.4:
   version "1.0.1"
   resolved "https://registry.npmjs.org/amdefine/-/amdefine-1.0.1.tgz"
