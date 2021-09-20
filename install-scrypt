@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-cd ./app/
-npm install scrypt --save
-cd node_modules/scrypt
-node-gyp configure
-node-gyp rebuild --target=1.8.2 --arch=x64 --dist-url=https://atom.io/download/atom-shell

@@ -15,10 +15,8 @@ import { app, BrowserWindow, ipcMain, Menu, Tray } from 'electron';
 import logger from './utils/logger';
 import MenuBuilder from './menu';
 import path from 'path';
-import AutoLaunch from 'auto-launch';
 import { appStore } from './utils/localStorage';
 import {
-  IPC_AUTO_START,
   IPC_CHECK_UPDATE,
   IPC_MESSAGE,
   IPC_OPEN_FILE,
@@ -67,20 +65,6 @@ if (process.platform === 'win32') {
     app.quit();
   }
 }
-
-const autoLaunch = new AutoLaunch({
-  name: APP_NAME,
-  path: app.getPath('exe')
-});
-
-autoLaunch
-  .isEnabled()
-  .then(isEnabled => {
-    if (!isEnabled && appStore.get(autoLaunch)) {
-      autoLaunch.enable();
-    }
-  })
-  .catch(logger.warn);
 
 /**
  * Functions
@@ -133,19 +117,6 @@ const checkUpdatesOnApplicationStart = () => {
     mainWindow && mainWindow.send(IPC_CHECK_UPDATE);
   }
 };
-
-/**
- * Add event listeners...
- */
-ipcMain.on(IPC_AUTO_START, (event, message) => {
-  const enable = Boolean(message);
-
-  if (enable) {
-    autoLaunch.enable();
-  } else {
-    autoLaunch.disable();
-  }
-});
 
 ipcMain.on(IPC_UPDATE_SYS_TRAY, (event, message) => {
   app.__minimizeOnClose = Boolean(message);
