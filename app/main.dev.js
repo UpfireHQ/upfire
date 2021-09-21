@@ -183,7 +183,11 @@ const initMainWindow = () => {
     width: process.env.NODE_ENV === 'development' ? 1180 : 1180,
     height: 750,
     minWidth: 950,
-    minHeight: 700
+    minHeight: 700,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
