@@ -270,6 +270,9 @@ export default typeToReducer(
     [CHANGE_BALANCE]: {
       SUCCESS: (state, action) => {
         const { address, changeBalance } = action.payload;
+        if (typeof address === 'undefined' || typeof changeBalance === 'undefined') {
+          return state;
+        }
         return state.setIn([address, "changeBalance"], fromJS(changeBalance));
       },
       FAIL: (state) => state.set("disableChangeBalanceLoading", true),
