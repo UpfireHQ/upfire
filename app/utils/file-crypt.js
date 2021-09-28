@@ -2,7 +2,7 @@
 import crypto from 'crypto';
 import fs from 'fs';
 
-export const ALGORITHMS = 'aes192';
+export const ALGORITHMS = "aes-192-cbc";
 
 export const encrypt = async (filepath, destination, secret, callback) => new Promise((resolve, reject) => {
   if (!fs.lstatSync(filepath).isFile()) {
