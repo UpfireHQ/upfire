@@ -2,10 +2,11 @@ import electron from 'electron';
 import path from 'path';
 import log from 'electron-log';
 import { APP_NAME } from '../constants';
+import { app } from '@electron/remote';
 
 if (log.transports) {
-  const userDataPath = (electron.app || electron.remote.app).getPath('userData');
-  
+  const userDataPath = (electron.app || app).getPath('userData');
+
   log.transports.console.level = 'debug';
   log.transports.console.format = '[{level}] {text}';
 

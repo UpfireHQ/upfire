@@ -1,8 +1,8 @@
 import updateVersionJson from '../update-version.json';
-import { remote } from 'electron';
+import { getGlobal } from '@electron/remote';
 
 export const DEBUG_PROD =
-  (remote && remote.getGlobal('DEBUG_PROD')) ||
+  getGlobal('DEBUG_PROD') ||
   process.env.NODE_ENV === 'development' ||
   process.env.DEBUG_PROD === 'true';
 

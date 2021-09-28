@@ -11,7 +11,6 @@ import {
   setNewDownloadStatusAction
 } from './actions';
 import trans from '../../translations';
-import { remote } from 'electron';
 import { parseTorrentFile } from '../../utils/torrent/helpers';
 import { FileEntity } from '../../utils/file';
 import checkDiskSpace from 'check-disk-space';
@@ -19,6 +18,7 @@ import { alertConfirmationStory, commonAlertStory, deleteConfirmationStory } fro
 import { addWebTorrentAction, removeWebTorrentAction } from '../../reducers/webTorrent/actions';
 import { dispatchTorrentStatsAction } from '../../utils/torrent/store';
 import logger from '../../utils/logger';
+import { dialog, getCurrentWindow } from '@electron/remote';
 
 const torrentExtensions = [TORRENT_EXTENSION.substring(1)];
 
@@ -69,19 +69,16 @@ export const dropDownloadTorrentStory = async (dispatch, files = []) => {
 };
 
 export const openDownloadTorrentStory = async (dispatch) => {
-  remote.dialog.showOpenDialog(
-    remote.getCurrentWindow(),
-    {
-      filters: [
-        {
-          name: trans('download.TorrentFile'),
-          extensions: torrentExtensions
-        }
-      ],
-      properties: ['openFile', 'multiSelections']
-    },
-    (filePaths) => dropDownloadTorrentStory(dispatch, filePaths)
-  );
+  const filePaths = dialog.showOpenDialogSync(getCurrentWindow(), {
+    filters: [
+      {
+        name: trans('download.TorrentFile'),
+        extensions: torrentExtensions,
+      },
+    ],
+    properties: ['openFile', 'multiSelections'],
+  });
+  dropDownloadTorrentStory(dispatch, filePaths);
 };
 
 export const startDownloadTorrentStory = async (dispatch, payload) => {
@@ -116,8 +113,10 @@ export const resumeDownloadTorrentStory = async (dispatch, payload) => {
   const torrents = Array.isArray(payload) ? payload : [payload];
   torrents.forEach(async ({infoHash}) => {
     const clientTorrent = getClientTorrent(infoHash);
-    clientTorrent.resume();
-    dispatchTorrentStatsAction(clientTorrent);
+    if (clientTorrent) {
+      clientTorrent.resume();
+      dispatchTorrentStatsAction(clientTorrent);
+    }
   });
 };
 
@@ -125,8 +124,10 @@ export const pauseDownloadTorrentStory = async (dispatch, payload) => {
   const torrents = Array.isArray(payload) ? payload : [payload];
   torrents.forEach(async ({infoHash}) => {
     const clientTorrent = getClientTorrent(infoHash);
-    clientTorrent.pause();
-    dispatchTorrentStatsAction(clientTorrent);
+    if (clientTorrent) {
+      clientTorrent.pause();
+      dispatchTorrentStatsAction(clientTorrent);
+    }
   });
 };
 

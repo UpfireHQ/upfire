@@ -18,14 +18,14 @@ import {
   Row,
   SecondFlex,
   TorrentInfo,
-  TorrentInfoDetails
+  TorrentInfoDetails,
 } from '../style';
 import UInput from '../../../../components/InputText';
 import FileButton from '../../../../components/Buttons/FileBtn';
 import { bytesToSize } from '../../../../utils/bytesformat';
 import MainBtn from '../../../../components/Buttons/MainBtn';
 import moment from 'moment';
-import { remote } from 'electron';
+import { dialog, getCurrentWindow } from '@electron/remote';
 import { TS_STATUS_DOWNLOAD } from '../../../../constants';
 import ProgressPopup from '../../../../components/ProgressPopup';
 import { getETHFee } from '../../../Wallet/selector';
@@ -34,20 +34,18 @@ class TorrentPopup extends PureComponent {
   state = {
     path: '',
     pathError: false,
-    active: 0
+    active: 0,
   };
 
   handlerSelectPath = () => {
     this.setState({ pathError: false });
-    remote.dialog.showOpenDialog(
-      remote.getCurrentWindow(),
-      {
-        title: trans('Upload.selectedPath'),
-        properties: ['createDirectory', 'openDirectory']
-      },
-      filePaths =>
-        filePaths && filePaths.length && this.setState({ path: filePaths[0] })
-    );
+    const filePaths = dialog.showOpenDialogSync(getCurrentWindow(), {
+      title: trans('Upload.selectedPath'),
+      properties: ['createDirectory', 'openDirectory'],
+    });
+    if (filePaths && filePaths.length) {
+      this.setState({ path: filePaths[0] });
+    }
   };
 
   handlerActive = (e, active) => {

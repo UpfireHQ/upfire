@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import {
   FILENAME_FILTER_SYMBOLS,
-  UPR_FLOAT_NUMBERS
+  UPR_FLOAT_NUMBERS,
 } from '../../../../constants';
 import { PopUpWithBg } from '../../../../components/PopUp';
 import bgMyUploads from '../../../../assets/images/bg-my-uploads.png';
@@ -14,7 +14,7 @@ import {
   PopAction,
   PopUpTitle,
   Row,
-  UfrInfoWrapper
+  UfrInfoWrapper,
 } from '../UploadsPage/style';
 import trans from '../../../../translations';
 import UInput from '../../../../components/InputText';
@@ -25,7 +25,7 @@ import ThirdBtn from '../../../../components/Buttons/ThirdBtn';
 import { DropContainer } from '../../../../style/containers';
 import FileSelector from '../FileSelector';
 
-import { remote } from 'electron';
+import { dialog, getCurrentWindow } from '@electron/remote';
 import { FileEntity, prettySize } from '../../../../utils/file';
 import { isTorrentFileExists } from '../../../../utils/torrent/helpers';
 
@@ -33,7 +33,7 @@ export default class UploadTorrent extends React.Component {
   state = {
     validationError: null,
     validationErrorFile: null,
-    size: 0
+    size: 0,
   };
 
   static get pattern() {
@@ -69,7 +69,8 @@ export default class UploadTorrent extends React.Component {
     const validationError = !(
       Boolean(name) &&
       Boolean(Number(cost)) &&
-      (files && files.length) &&
+      files &&
+      files.length &&
       Boolean(path)
     );
     const validationErrorFile = isTorrentFileExists(path, name);
@@ -85,16 +86,11 @@ export default class UploadTorrent extends React.Component {
   };
 
   handlerSelectDestinationPath = () => {
-    remote.dialog.showOpenDialog(
-      remote.getCurrentWindow(),
-      {
-        title: trans('Upload.selectedPath'),
-        properties: ['createDirectory', 'openDirectory']
-      },
-      filePaths => {
-        this.onChange({ path: String(filePaths || '') });
-      }
-    );
+    const filePaths = dialog.showOpenDialogSync(getCurrentWindow(), {
+      title: trans('Upload.selectedPath'),
+      properties: ['createDirectory', 'openDirectory'],
+    });
+    this.onChange({ path: String(filePaths || '') });
   };
 
   onChangeInput = (name, { validity, value }, validator) => {
@@ -105,7 +101,7 @@ export default class UploadTorrent extends React.Component {
     }
   };
 
-  handlerChangeName = e => {
+  handlerChangeName = (e) => {
     const { value = '' } = e.target || {};
     this.onChangeInput('name', e.target || {}, () => {
       return FILENAME_FILTER_SYMBOLS.split('').reduce(
@@ -115,37 +111,39 @@ export default class UploadTorrent extends React.Component {
     });
   };
 
-  handlerChangeCost = e => this.onChangeInput('cost', e.target || {});
+  handlerChangeCost = (e) => this.onChangeInput('cost', e.target || {});
 
-  handlerChangeDescription = e =>
+  handlerChangeDescription = (e) =>
     this.onChangeInput('description', e.target || {});
 
   onAddFiles(newFiles) {
     let { files = [] } = this.uploadFiles;
     if (newFiles && newFiles.length) {
       files = _.uniqWith(
-        _.concat(files, newFiles.map(f => new FileEntity(f))),
+        _.concat(
+          files,
+          newFiles.map((f) => new FileEntity(f))
+        ),
         (a, b) => String(a) === String(b)
       );
       this.onChange({ files });
     }
   }
 
-  handlerAddFileDrop = files => {
+  handlerAddFileDrop = (files) => {
     this.onAddFiles(files);
   };
 
   handlerAddFileDialog = () => {
-    remote.dialog.showOpenDialog(
-      remote.getCurrentWindow(),
-      {
-        properties: ['openFile', 'multiSelections']
-      },
-      filePaths => filePaths && filePaths.length && this.onAddFiles(filePaths)
-    );
+    const filePaths = dialog.showOpenDialogSync(getCurrentWindow(), {
+      properties: ['openFile', 'multiSelections'],
+    });
+    if (filePaths && filePaths.length) {
+      this.onAddFiles(filePaths);
+    }
   };
 
-  handlerRemoveFile = index => {
+  handlerRemoveFile = (index) => {
     const { files = [] } = this.uploadFiles;
     files.splice(index, 1);
     this.onChange({ files });
@@ -158,7 +156,7 @@ export default class UploadTorrent extends React.Component {
       files = [],
       name = '',
       cost = '',
-      description = ''
+      description = '',
     } = this.uploadFiles;
 
     return (
@@ -167,7 +165,10 @@ export default class UploadTorrent extends React.Component {
           <ClosePopUp onClick={this.handlerCancel}>
             <span className="icon-cancel" />
           </ClosePopUp>
-          <PopUpTitle className="upload-text"><span className="icon-ico2-uploads"></span>{trans('popups.upload.UploadDetails')}</PopUpTitle>
+          <PopUpTitle className="upload-text">
+            <span className="icon-ico2-uploads"></span>
+            {trans('popups.upload.UploadDetails')}
+          </PopUpTitle>
           <Row>
             <HalfColumn>
               <UInput

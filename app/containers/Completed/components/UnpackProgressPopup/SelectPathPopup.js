@@ -8,7 +8,7 @@ import { ActionsOne, FileCover, FullFileColumn, Row } from '../../../Downloads/c
 import InputText from '../../../../components/InputText';
 import FileBtn from '../../../../components/Buttons/FileBtn';
 import MainBtn from '../../../../components/Buttons/MainBtn';
-import { remote } from 'electron';
+import { dialog, getCurrentWindow } from '@electron/remote';
 
 class SelectPathPopup extends PureComponent {
   state = {
@@ -17,15 +17,14 @@ class SelectPathPopup extends PureComponent {
   };
 
   handlerSelectPath = () => {
-    this.setState({pathError: false});
-    remote.dialog.showOpenDialog(
-      remote.getCurrentWindow(),
-      {
-        title: trans('Upload.selectedPath'),
-        properties: ['createDirectory', 'openDirectory']
-      },
-      (filePaths) => filePaths && filePaths.length && this.setState({path: filePaths[0]})
-    );
+    this.setState({ pathError: false });
+    const filePaths = dialog.showOpenDialogSync(getCurrentWindow(), {
+      title: trans('Upload.selectedPath'),
+      properties: ['createDirectory', 'openDirectory'],
+    });
+    if (filePaths && filePaths.length) {
+      this.setState({ path: filePaths[0] });
+    }
   };
 
   handlerRun = () => {

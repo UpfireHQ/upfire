@@ -24,8 +24,13 @@ import {
   IPC_PROGRESS,
   IPC_PROGRESS_DONE,
   IPC_UPDATE_INSTALL,
-  IPC_UPDATE_SYS_TRAY
+  IPC_UPDATE_SYS_TRAY,
 } from './constants';
+import {
+  initialize as initializeRemote,
+  enable as enableRemote,
+} from '@electron/remote/main';
+initializeRemote();
 
 logger.info('*** RUN ***');
 
@@ -70,22 +75,28 @@ if (process.platform === 'win32') {
  */
 
 const installExtensions = async () => {
-  const { default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } = require('electron-devtools-installer');
+  const {
+    default: installExtension,
+    REACT_DEVELOPER_TOOLS,
+    REDUX_DEVTOOLS,
+  } = require('electron-devtools-installer');
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
   const extensions = [REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS];
 
   return Promise.all(
-    extensions.map(name => {
-      console.log('installing with name', name, forceDownload)
-      return installExtension(name, forceDownload)
+    extensions.map((name) => {
+      console.log('installing with name', name, forceDownload);
+      return installExtension(name, forceDownload);
     })
-  ).then((names: string[]) => {
-    console.log(`Installed extensions ${names.join(',')}`);
-    return null;
-  }).catch((err) => {
-    console.warn('Could not install extension');
-    console.warn(err);
-  });
+  )
+    .then((names: string[]) => {
+      console.log(`Installed extensions ${names.join(',')}`);
+      return null;
+    })
+    .catch((err) => {
+      console.warn('Could not install extension');
+      console.warn(err);
+    });
 };
 
 const sendStatusToWindow = (text, message = IPC_MESSAGE) => {
@@ -134,12 +145,12 @@ ipcMain.on(IPC_UPDATE_SYS_TRAY, (event, message) => {
 
 ipcMain.on(IPC_UPDATE_INSTALL, (e, url) => {
   download(BrowserWindow.getFocusedWindow(), url, {
-    onProgress: value => {
+    onProgress: (value) => {
       mainWindow && mainWindow.send(IPC_PROGRESS, value);
     },
-    openFolderWhenDone: true
+    openFolderWhenDone: true,
   })
-    .then(dl => {
+    .then((dl) => {
       mainWindow && mainWindow.send(IPC_PROGRESS_DONE);
     })
     .catch(logger.error);
@@ -169,7 +180,8 @@ app.on('will-finish-launching', () => {
   winFiles();
 });
 
-app.whenReady()
+app
+  .whenReady()
   .then(async () => {
     sendStatusToWindow('ready');
 
@@ -188,8 +200,8 @@ app.whenReady()
     initTray();
     return null;
   })
-  .catch(err => {
-    throw err
+  .catch((err) => {
+    throw err;
   });
 
 const initMainWindow = () => {
@@ -203,8 +215,9 @@ const initMainWindow = () => {
       contextIsolation: false,
       devTools: process.env.NODE_ENV === 'development',
       nodeIntegration: true,
-    }
+    },
   });
+  enableRemote(mainWindow.webContents);
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
 
@@ -224,7 +237,7 @@ const initMainWindow = () => {
     checkUpdatesOnApplicationStart();
   });
 
-  mainWindow.on('close', event => {
+  mainWindow.on('close', (event) => {
     if (app.__isQuiting) {
       return;
     }
@@ -233,7 +246,7 @@ const initMainWindow = () => {
       event.preventDefault();
 
       if (mainWindow && mainWindow.isFullScreen()) {
-        mainWindow.once('leave-full-screen', function() {
+        mainWindow.once('leave-full-screen', function () {
           mainWindow && mainWindow.hide();
         });
         mainWindow.setFullScreen(false);
@@ -282,13 +295,13 @@ const contextMenu = () =>
         if (process.platform === 'darwin') {
           app.dock.show();
         }
-      }
+      },
     },
     {
       label: 'Quit',
       click: () => {
         app.__isQuiting = true;
         app.quit();
-      }
-    }
+      },
+    },
   ]);
