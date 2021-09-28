@@ -3,7 +3,6 @@ import thunk from 'redux-thunk';
 import { createHashHistory } from 'history';
 import { routerActions, routerMiddleware } from 'react-router-redux';
 import promiseMiddleware from 'redux-promise-middleware';
-//import { createLogger } from 'redux-logger';
 import rootReducer from '../reducers';
 
 const history = createHashHistory();

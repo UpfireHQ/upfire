@@ -11,12 +11,13 @@
  * @flow
  */
 import { app, BrowserWindow, ipcMain, Menu, Tray } from 'electron';
-
+import path from 'path';
+import { download } from 'electron-dl';
 import logger from './utils/logger';
 import MenuBuilder from './menu';
-import path from 'path';
 import { appStore } from './utils/localStorage';
 import {
+  APP_NAME,
   IPC_CHECK_UPDATE,
   IPC_MESSAGE,
   IPC_OPEN_FILE,
@@ -24,9 +25,7 @@ import {
   IPC_PROGRESS_DONE,
   IPC_UPDATE_INSTALL,
   IPC_UPDATE_SYS_TRAY
-} from './constants/ipc';
-import { APP_NAME } from './constants/app';
-import { download } from 'electron-dl';
+} from './constants';
 
 logger.info('*** RUN ***');
 
@@ -50,7 +49,7 @@ if (
 }
 
 if (process.platform === 'win32') {
-  let shouldQuit = app.makeSingleInstance((argv, workingDirectory) => {
+  const shouldQuit = app.makeSingleInstance((argv) => {
     // Someone tried to run a second instance, we should focus our window.
     if (mainWindow) {
       if (mainWindow.isMinimized()) {
@@ -71,17 +70,28 @@ if (process.platform === 'win32') {
  */
 
 const installExtensions = async () => {
-  const installer = require('electron-devtools-installer');
+  const { default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } = require('electron-devtools-installer');
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
+  const extensions = [REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS];
 
   return Promise.all(
-    extensions.map(name => installer.default(installer[name], forceDownload))
-  ).catch(logger.warn);
+    extensions.map(name => {
+      console.log('installing with name', name, forceDownload)
+      return installExtension(name, forceDownload)
+    })
+  ).then((names: string[]) => {
+    console.log(`Installed extensions ${names.join(',')}`);
+    return null;
+  }).catch((err) => {
+    console.warn('Could not install extension');
+    console.warn(err);
+  });
 };
 
 const sendStatusToWindow = (text, message = IPC_MESSAGE) => {
-  mainWindow && mainWindow.send(message, text);
+  if (typeof mainWindow !== 'undefined' && mainWindow !== null) {
+    mainWindow.send(message, text);
+  }
 };
 
 const winFiles = (argv = null) => {
@@ -159,34 +169,40 @@ app.on('will-finish-launching', () => {
   winFiles();
 });
 
-app.on('ready', async () => {
-  sendStatusToWindow('ready');
+app.whenReady()
+  .then(async () => {
+    sendStatusToWindow('ready');
 
-  if (
-    process.env.NODE_ENV === 'development' ||
-    process.env.DEBUG_PROD === 'true'
-  ) {
-    await installExtensions();
-  }
+    if (
+      process.env.NODE_ENV === 'development' ||
+      process.env.DEBUG_PROD === 'true'
+    ) {
+      await installExtensions();
+    }
 
-  app.__isQuiting = false;
-  app.__minimizeOnClose = Boolean(appStore.get('minimizeOnClose'));
+    app.__isQuiting = false;
+    app.__minimizeOnClose = Boolean(appStore.get('minimizeOnClose'));
 
-  initMainWindow();
+    initMainWindow();
 
-  initTray();
-});
+    initTray();
+    return null;
+  })
+  .catch(err => {
+    throw err
+  });
 
 const initMainWindow = () => {
   mainWindow = new BrowserWindow({
     show: false,
-    width: process.env.NODE_ENV === 'development' ? 1180 : 1180,
+    width: 1180,
     height: 750,
     minWidth: 950,
     minHeight: 700,
     webPreferences: {
+      contextIsolation: false,
+      devTools: process.env.NODE_ENV === 'development',
       nodeIntegration: true,
-      contextIsolation: false
     }
   });
 
