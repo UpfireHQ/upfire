@@ -229,7 +229,6 @@ export default class WalletGraphs extends Component {
 
   get balanceTimeChart() {
     const { AmChartsObj, isTest } = this.state;
-    console.log({ AmChartsObj, isTest });
     const { disableChangeBalanceLoading, changeBalance } = this.props;
 
     if (!changeBalance && !disableChangeBalanceLoading && !isTest) {

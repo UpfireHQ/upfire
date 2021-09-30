@@ -51,9 +51,11 @@ export default class UpfiringContract {
     const events = [];
     if (address) {
       try {
+        const latestBlock = await EthClient.instance.eth.getBlock('latest')
+
         const result = await this._contract.getPastEvents(event, {
           filter: { _to: address },
-          fromBlock: 0,
+          fromBlock: latestBlock.number - 4900, // 5000 = max range
           toBlock: 'latest'
         });
         for (let e of result) {
@@ -63,7 +65,11 @@ export default class UpfiringContract {
           });
         }
         return events;
-      } catch (e) {}
+      } catch (err) {
+        console.error(`getEventInfo failed for event ${JSON.stringify(event)} and address ${address}`);
+        console.error(err);
+        throw err;
+      }
     }
   }
 
@@ -74,19 +80,31 @@ export default class UpfiringContract {
   async balanceOf(address) {
     return EthClient.instance
       .call(this.methods.balanceOf(address))
-      .catch(() => 0);
+      .catch((err) => {
+        console.error(`Could not fetch balanceOf address ${address}`)
+        console.error(err)
+        throw err;
+      });
   }
 
   async balanceOfUPR(address) {
     return EthClient.instance
       .call(this.methods.balanceOfUPR(address))
-      .catch(() => 0);
+      .catch((err) => {
+        console.error(`Could not fetch balanceOfUPR of address ${address}`)
+        console.error(err)
+        throw err;
+      });
   }
 
   async check(torrent, address) {
     return EthClient.instance
       .call(this.methods.check(torrent, address))
-      .catch(() => false);
+      .catch((err) => {
+        console.error(`Could not check torrent ${torrent} for ${address}`)
+        console.error(err)
+        throw err;
+      });
   }
 
   async refill(wallet, value, gas = null) {
