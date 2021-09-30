@@ -98,6 +98,10 @@ export default class UpfiringContract {
   }
 
   async check(torrent, address) {
+    if (!address) {
+      return false;
+    }
+
     return EthClient.instance
       .call(this.methods.check(torrent, address))
       .catch((err) => {
@@ -173,28 +177,27 @@ export default class UpfiringContract {
   }
 
   async pay(wallet, torrent, amount, owner, seeders, freeSeeders, gas = null) {
-    const method = this.methods.pay(
-      torrent,
-      String(amount),
-      owner,
-      seeders,
-      freeSeeders
-    );
-    logger.info('!UpfiringContract.pay', {
-      wallet,
-      torrent,
-      amount,
-      owner,
-      seeders,
-      freeSeeders
-    });
-    logger.info('!UpfiringContract.pay', method);
-    return EthClient.instance.sendSignedTransaction(
-      wallet,
-      method,
-      this.address,
-      gas
-    );
+    console.log('amount', amount)
+    try {
+      const method = this.methods.pay(
+        torrent,
+        String(amount),
+        owner,
+        seeders,
+        freeSeeders
+      );
+      return EthClient.instance.sendSignedTransaction(
+        wallet,
+        method,
+        this.address,
+        gas
+      );
+    } catch (err) {
+      console.error('Could not pay');
+      console.error(err);
+      throw err;
+    }
+
   }
 
   async estimatePay(
