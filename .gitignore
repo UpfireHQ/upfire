@@ -62,3 +62,4 @@ blockchain/scripts/results/dev-*.json
 
 .local-wallet
 
+torrent-*

@@ -2,6 +2,7 @@ import { applyMiddleware, compose, createStore } from 'redux';
 import thunk from 'redux-thunk';
 import { createHashHistory } from 'history';
 import { routerActions, routerMiddleware } from 'react-router-redux';
+import logger from 'redux-logger'
 import promiseMiddleware from 'redux-promise-middleware';
 import rootReducer from '../reducers';
 
@@ -29,6 +30,7 @@ const configureStore = (initialState?: any) => {
 
   // Router Middleware
   const router = routerMiddleware(history);
+  middleware.push(logger);
   middleware.push(router);
   middleware.push(promiseMiddleware({
     promiseTypeSuffixes: ['START', 'SUCCESS', 'FAIL']

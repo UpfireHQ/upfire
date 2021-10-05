@@ -50,7 +50,6 @@ export const dispatchWireAction = (torrent, wire, value = {}) => {
     }
 
     if (data.token || data.owner) {
-      logger.debug('*** update torrent token|owner', {torrent, data});
       dispatchTorrentAction(torrent, data);
     }
   }
