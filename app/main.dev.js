@@ -11,7 +11,6 @@
  * @flow
  */
 import { app, BrowserWindow, ipcMain, Menu, Tray } from 'electron';
-import path from 'path';
 import { download } from 'electron-dl';
 import logger from './utils/logger';
 import MenuBuilder from './menu';
@@ -30,6 +29,7 @@ import {
   initialize as initializeRemote,
   enable as enableRemote,
 } from '@electron/remote/main';
+import { argv } from 'process';
 initializeRemote();
 
 logger.info('*** RUN ***');
@@ -53,21 +53,46 @@ if (
   global.DEBUG_PROD = true;
 }
 
-if (process.platform === 'win32') {
-  const shouldQuit = app.makeSingleInstance((argv) => {
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
     // Someone tried to run a second instance, we should focus our window.
     if (mainWindow) {
-      if (mainWindow.isMinimized()) {
-        mainWindow.restore();
-      }
+      if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.focus();
-      winFiles(argv);
+      if (process.platform === 'win32') {
+        winFiles(argv);
+      }
     }
   });
 
-  if (shouldQuit) {
-    app.quit();
-  }
+  // Create mainWIndow, Load the rest of the app, etc...
+  app
+    .whenReady()
+    .then(async () => {
+      sendStatusToWindow('ready');
+
+      if (
+        process.env.NODE_ENV === 'development' ||
+        process.env.DEBUG_PROD === 'true'
+      ) {
+        await installExtensions();
+      }
+
+      app.__isQuiting = false;
+      app.__minimizeOnClose = Boolean(appStore.get('minimizeOnClose'));
+
+      initMainWindow();
+
+      initTray();
+      return null;
+    })
+    .catch((err) => {
+      throw err;
+    });
 }
 
 /**
@@ -179,30 +204,6 @@ app.on('will-finish-launching', () => {
 
   winFiles();
 });
-
-app
-  .whenReady()
-  .then(async () => {
-    sendStatusToWindow('ready');
-
-    if (
-      process.env.NODE_ENV === 'development' ||
-      process.env.DEBUG_PROD === 'true'
-    ) {
-      await installExtensions();
-    }
-
-    app.__isQuiting = false;
-    app.__minimizeOnClose = Boolean(appStore.get('minimizeOnClose'));
-
-    initMainWindow();
-
-    initTray();
-    return null;
-  })
-  .catch((err) => {
-    throw err;
-  });
 
 const initMainWindow = () => {
   mainWindow = new BrowserWindow({
