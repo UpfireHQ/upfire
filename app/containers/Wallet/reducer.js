@@ -63,12 +63,13 @@ const address = walletStore.get("address");
 
 const initialState = fromJS({
   address,
-  [address]: walletStore,
+  [address]: walletStore.store,
 });
 
 export default typeToReducer(
   {
     [SET_WALLET]: (state, action) => {
+      console.log('set wallet', action);
       const { address, publicKey, wallet } = action.payload;
       return state
         .set("address", String(address))
@@ -80,6 +81,7 @@ export default typeToReducer(
     },
 
     [REMOVE_WALLET]: (state) => {
+      console.log('remove wallet');
       return state.set("address", null);
     },
 
