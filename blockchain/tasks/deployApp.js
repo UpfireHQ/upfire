@@ -19,6 +19,8 @@ task('deployApp', 'Deploys the dapp').setAction(async () => {
     0
   ]);
 
+  await upfireStore.transferOwnership(upfiring.address);
+
   deployResults.Upfiring = upfiring.address;
   console.info(`Upfiring deployed at ${upfiring.address}`);
 
