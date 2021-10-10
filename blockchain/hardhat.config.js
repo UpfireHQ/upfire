@@ -1,9 +1,11 @@
 require('dotenv').config();
 require('hardhat-contract-sizer');
 require('@nomiclabs/hardhat-waffle');
+require('@openzeppelin/hardhat-upgrades');
 require('./tasks/deployTasks');
+require('./tasks/deployApp');
 
-const BSC_PRIVATE_KEY = process.env.BSC_PRIVATE_KEY;
+const { BSC_PRIVATE_KEY } = process.env;
 
 const optimizeSettings = {
   settings: {

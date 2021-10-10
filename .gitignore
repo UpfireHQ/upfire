@@ -57,6 +57,8 @@ npm-debug.log.*
 .vscode
 
 blockchain/.env
+blockchain/cache
+blockchain/artifacts
 
 blockchain/scripts/results/dev-*.json
 

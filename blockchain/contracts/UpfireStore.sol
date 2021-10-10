@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 
-contract UpfireStore is Ownable {
+contract UpfireStore is Initializable, OwnableUpgradeable {
     using SafeMath for uint256;
 
     mapping(bytes32 => mapping(address => uint256)) private payments;
@@ -13,7 +14,12 @@ contract UpfireStore is Ownable {
     mapping(address => uint256) private totalReceiving;
     mapping(address => uint256) private totalSpending;
 
-    constructor() {}
+    function initialize()
+    public
+    initializer
+    {
+        OwnableUpgradeable.__Ownable_init();
+    }
 
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
