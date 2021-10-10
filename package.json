@@ -1,7 +1,7 @@
 {
   "name": "upfire",
   "productName": "Upfire",
-  "version": "1.1.6",
+  "version": "1.2.0",
   "description": "Upfire",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",
