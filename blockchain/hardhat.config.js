@@ -35,6 +35,10 @@ module.exports = {
     bsctest: {
       accounts: [`0x${BSC_PRIVATE_KEY}`],
       url: 'https://data-seed-prebsc-1-s1.binance.org:8545/'
+    },
+    bscmain: {
+      accounts: [`0x${BSC_PRIVATE_KEY}`],
+      url: 'https://bsc-dataseed.binance.org/',
     }
   },
   solidity: {

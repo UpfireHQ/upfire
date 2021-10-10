@@ -1,9 +1,10 @@
 {
   "tokenContract": "",
-  "upfiringContract": "",
+  "upfiringContract": "0xCF34Ee2951Ae4d86dB400F61682EFC22C53D35f8",
+  "upfiringStoreContract": "0x5C1e989AC9c00E0BF570257E60f927B71FEAe13F",
   "uprStakingContract": "",
-  "ufrTokenContract": "",
+  "ufrTokenContract": "0xf720e38f678b29b243f7d53b56acbf5de98f2385",
   "uprSwapContract": "",
-  "providerUrl": "https://mainnet.infura.io",
-  "etherscanUrl": "https://etherscan.io"
+  "providerUrl": "https://bsc-dataseed.binance.org",
+  "etherscanUrl": "https://bscscan.com"
 }
