@@ -8,7 +8,7 @@
   },
   "scripts": {
     "compile": "npx hardhat compile",
-    "test": "npx hardhat test",
+    "test": "npx hardhat test --network hardhat",
     "deploy": "npx hardhat deploy --network",
     "migrate:rinkeby": "npx hardhat run --network rinkeby scripts/deploy.js",
     "migrate:mainnet": "npx hardhat run --network live scripts/deploy.js"

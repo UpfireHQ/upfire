@@ -1,11 +1,13 @@
+/* eslint-disable no-unused-expressions */
+/* global describe, it, ethers */
 const { expect } = require('chai');
 
-describe('UPR Swap', async function() {
+describe('UPR Swap', async () => {
   let ufrToken;
   let uprToken;
   let uprSwap;
 
-  it('Should be deploy token', async function() {
+  it('Should be deploy token', async () => {
     const [, admin] = await ethers.getSigners();
     const UFRToken = await ethers.getContractFactory('UPR');
     ufrToken = await UFRToken.deploy();
@@ -22,18 +24,18 @@ describe('UPR Swap', async function() {
     expect(uprSwap.deployed()).not.to.throw;
   });
 
-  it('should set swap rate', async function() {
+  it('should set swap rate', async () => {
     const [, admin] = await ethers.getSigners();
     await uprSwap.connect(admin).setSwapRate(50);
     expect(await uprSwap.getSwapRate()).to.equal(50);
   });
 
-  it('should set UPRSwap to minter UPR token', async function() {
+  it('should set UPRSwap to minter UPR token', async () => {
     await uprToken.addAdmin(uprSwap.address);
     expect(await uprToken.isAdmin(uprSwap.address)).to.equal(true);
   });
 
-  it('should be staking with UPR', async function() {
+  it('should be staking with UPR', async () => {
     const [owner] = await ethers.getSigners();
     await ufrToken.approve(uprSwap.address, 10000);
     expect(await ufrToken.allowance(owner.address, uprSwap.address)).to.equal(
