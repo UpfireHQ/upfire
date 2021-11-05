@@ -1,0 +1,11 @@
+name: Build
+on:
+  push:
+    tags:
+    - '*'
+jobs:
+  Build-App:
+    runs-on: ubuntu-latest
+    steps:
+      - run: yarn build
+
