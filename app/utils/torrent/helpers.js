@@ -183,8 +183,6 @@ export const getPaymentData = (torrent, percentageFee) => {
 
   const amountIncludeFee = fee.plus(new BigNumber(amount));
 
-  console.log('amountIncludeFee', amountIncludeFee.toString());
-
   return {
     torrent: torrent.infoHash,
     amount: amountIncludeFee.toString(),

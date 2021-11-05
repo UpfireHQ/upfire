@@ -48,7 +48,6 @@ export default typeToReducer({
   },
 
   [AUTO_START_UNPACK]: (state, {payload}) => {
-    logger.info('SET_UNPACK_TORRENT', payload ? payload : '---');
     return (payload) ? state.set('autoStartUnpack', fromJS(payload)) : state.delete('autoStartUnpack');
   }
 

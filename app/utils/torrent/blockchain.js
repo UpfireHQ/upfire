@@ -12,6 +12,11 @@ export const checkMyPayment = async (torrent, wallet, tx) => {
 };
 
 export const checkPayment = async (torrent, address, price) => {
+  // there is no need to query the blockchain if the file was free
+  if (price === 0 || price === '0') {
+    return true;
+  }
+
   const amount = Number(await UpfiringContract.instance.check(torrent, address));
   price = EthClient.instance.toWei(price);
 

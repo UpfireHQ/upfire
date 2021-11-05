@@ -154,15 +154,10 @@ export const unpackTorrentStory = async (dispatch, payload) => {
 
   const successPayment =
     torrent &&
+    (torrent.price === 0 ||
     ((torrent.payment &&
       (await checkMyPayment(infoHash, address, torrent.payment))) ||
-      (await checkPayment(infoHash, address, torrent.price)));
-  logger.warn(
-    'unpackTorrentStory >> successPayment',
-    infoHash,
-    successPayment,
-    torrent && torrent.payment
-  );
+      (await checkPayment(infoHash, address, torrent.price))));
 
   if (successPayment) {
     dispatch(autoStartUnpackAction(infoHash));
@@ -225,21 +220,25 @@ export const startUnpackTorrentStory = async (dispatch, payload) => {
       price: gasPrice,
       limit: GAS_LIMIT_MAX
     };
-    const payment = await payTorrent(
-      decodedWallet,
-      getPaymentData(torrent, percentageFee),
-      gas
-    );
+
+    const value = {};
+    if (price > 0) {
+      value.payment = await payTorrent(
+        decodedWallet,
+        getPaymentData(torrent, percentageFee),
+        gas
+      );
+    }
 
     dispatch(
       torrentAction({
         torrent: getClientTorrent(infoHash),
-        value: { payment }
+        value,
       })
     );
 
     dispatch(autoStartUnpackAction(infoHash));
-    if (!(await waitPaymentTransactionStory(dispatch, infoHash, payment))) {
+    if (price === 0 || !(await waitPaymentTransactionStory(dispatch, infoHash, value.payment))) {
       dispatch(autoStartUnpackAction());
       dispatch(setUnpackTorrentStatusAction());
     }

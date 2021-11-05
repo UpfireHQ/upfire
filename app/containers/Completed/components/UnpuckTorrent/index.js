@@ -89,7 +89,9 @@ class UnpuckTorrent extends PureComponent {
       gasLimit
     };
 
-    onStartUnpackTorrent && onStartUnpackTorrent(payload);
+    if (onStartUnpackTorrent) {
+      onStartUnpackTorrent(payload);
+    }
   };
 
   handlerInputPassword = e => {
