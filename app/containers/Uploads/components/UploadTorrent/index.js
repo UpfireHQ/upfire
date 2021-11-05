@@ -66,23 +66,23 @@ export default class UploadTorrent extends React.Component {
     const { path, files, name, cost } = this.uploadFiles;
     const { onCreateUploadTorrent, wallet } = this.props;
 
-    const validationError = !(
+    const validationSuccessful =
       Boolean(name) &&
-      Boolean(Number(cost)) &&
       files &&
       files.length &&
-      Boolean(path)
-    );
+      Boolean(path);
+
     const validationErrorFile = isTorrentFileExists(path, name);
 
-    this.setState({ validationError, validationErrorFile });
+    this.setState({ validationError: !validationSuccessful, validationErrorFile });
 
-    if (validationError || validationErrorFile) {
+    if (!validationSuccessful || validationErrorFile) {
       return;
     }
 
-    onCreateUploadTorrent &&
+    if (onCreateUploadTorrent) {
       onCreateUploadTorrent({ ...this.uploadFiles, wallet });
+    }
   };
 
   handlerSelectDestinationPath = () => {

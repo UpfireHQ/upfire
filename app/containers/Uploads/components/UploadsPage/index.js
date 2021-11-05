@@ -175,7 +175,7 @@ export default class UploadsPage extends PureComponent {
             {trans(item && item.paused ? 'table.Paused' : 'table.Seeding')}
           </td>
           <td>
-            {item && item.price} {trans('popups.upload.ETH')}
+            {item && item.price || '0'} {trans('popups.upload.ETH')}
           </td>
           <td>
             {(item && item.size && bytesToSize(item.size)) || trans('Unknown')}
