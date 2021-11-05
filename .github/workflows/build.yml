@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - run: npm i -g dmg-license
       - run: yarn
       - run: yarn package
       - name: Store mac build
