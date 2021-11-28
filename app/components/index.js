@@ -5,7 +5,6 @@ export * from './prompt';
 
 export * from './PopUp';
 
-import CurrencyRates from './CurrencyRates';
 import Info from './Info';
 import InputText from './InputText';
 import InputTextarea from './InputTextarea';
@@ -23,7 +22,6 @@ import ProgressPopup from './ProgressPopup';
 import InputGas from './InputGas';
 
 export {
-  CurrencyRates,
   Info,
   InputText,
   InputTextarea,

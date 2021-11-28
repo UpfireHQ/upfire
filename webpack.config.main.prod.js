@@ -4,7 +4,6 @@
 
 const webpack = require('webpack');
 const merge = require('webpack-merge');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const baseConfig = require('./webpack.config.base');
 const CheckNodeEnv = require('./internals/scripts/CheckNodeEnv');
@@ -23,16 +22,6 @@ module.exports = merge.smart(baseConfig, {
   output: {
     path: __dirname,
     filename: './app/main.prod.js'
-  },
-
-  optimization: {
-    minimizer: [
-      new UglifyJSPlugin({
-        parallel: true,
-        sourceMap: true,
-        cache: true
-      })
-    ]
   },
 
   plugins: [

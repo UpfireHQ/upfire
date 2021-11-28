@@ -65,3 +65,5 @@ blockchain/scripts/results/dev-*.json
 .local-wallet
 
 torrent-*
+public/*.svg
+public/*.png

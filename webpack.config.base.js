@@ -5,7 +5,6 @@
 const path = require('path');
 const webpack = require('webpack');
 const fs = require('fs');
-const { dependencies: externals } = require('./app/package.json');
 const { dependencies: possibleExternals } = require('./package.json');
 
 // Find all the dependencies without a `main` property and add them as webpack externals
@@ -30,7 +29,6 @@ function filterDepWithoutEntryPoints(dep) {
 
 module.exports = {
   externals: [
-    ...Object.keys(externals || {}),
     ...Object.keys(possibleExternals || {}).filter(filterDepWithoutEntryPoints)
   ],
 
@@ -55,6 +53,10 @@ module.exports = {
     libraryTarget: 'commonjs2'
   },
 
+  optimization: {
+    moduleIds: 'named',
+  },
+
   /**
    * Determine the array of extensions that should be used to resolve modules.
    */
@@ -67,7 +69,5 @@ module.exports = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production'
     }),
-
-    new webpack.NamedModulesPlugin()
   ]
 };

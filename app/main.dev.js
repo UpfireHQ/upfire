@@ -10,6 +10,7 @@
  *
  * @flow
  */
+import path from 'path';
 import { app, BrowserWindow, ipcMain, Menu, Tray } from 'electron';
 import { download } from 'electron-dl';
 import logger from './utils/logger';
@@ -75,13 +76,6 @@ if (!gotTheLock) {
     .then(async () => {
       sendStatusToWindow('ready');
 
-      if (
-        process.env.NODE_ENV === 'development' ||
-        process.env.DEBUG_PROD === 'true'
-      ) {
-        await installExtensions();
-      }
-
       app.__isQuiting = false;
       app.__minimizeOnClose = Boolean(appStore.get('minimizeOnClose'));
 
@@ -98,31 +92,6 @@ if (!gotTheLock) {
 /**
  * Functions
  */
-
-const installExtensions = async () => {
-  const {
-    default: installExtension,
-    REACT_DEVELOPER_TOOLS,
-    REDUX_DEVTOOLS,
-  } = require('electron-devtools-installer');
-  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = [REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS];
-
-  return Promise.all(
-    extensions.map((name) => {
-      console.log('installing with name', name, forceDownload);
-      return installExtension(name, forceDownload);
-    })
-  )
-    .then((names: string[]) => {
-      console.log(`Installed extensions ${names.join(',')}`);
-      return null;
-    })
-    .catch((err) => {
-      console.warn('Could not install extension');
-      console.warn(err);
-    });
-};
 
 const sendStatusToWindow = (text, message = IPC_MESSAGE) => {
   if (typeof mainWindow !== 'undefined' && mainWindow !== null) {
