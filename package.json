@@ -31,19 +31,11 @@
     "version": "node ./update-version.js",
     "postversion": "git commit -a -m \"Release new version\""
   },
+  "main": "./app/main.prod.js",
   "browserslist": "electron 1.6",
   "build": {
     "productName": "Upfire",
     "appId": "org.develar.Upfire",
-    "files": [
-      "dist/",
-      "assets/",
-      "node_modules/",
-      "app.html",
-      "main.prod.js",
-      "main.prod.js.map",
-      "package.json"
-    ],
     "dmg": {
       "contents": [
         {
