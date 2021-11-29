@@ -7,6 +7,7 @@ export const UPR_FLOAT_NUMBERS = 4;
 
 export const TORRENT_SEPARATOR = '///////////';
 
+export const FILE_FREE_EXTENSION = '.free';
 export const FILE_ENCRYPT_EXTENSION = '.enc';
 export const TORRENT_EXTENSION = '.upr';
 

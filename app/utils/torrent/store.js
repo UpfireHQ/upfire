@@ -122,25 +122,21 @@ export const dispatchCheckOwnerAndPrice = (webTorrent, torrent) => {
 export const autoStartTorrentAction = (infoHash) => {
   const state = getState('completed');
 
-  logger.info('autoStartTorrentAction %s == %s', infoHash, state && String(state['autoStartUnpack']));
-
   if (state && String(state['autoStartUnpack']) === String(infoHash)) {
     const torrent = getTorrentState(infoHash);
     const {location} = getState('router');
 
-    console.log('** autoStartTorrentAction', torrent, location);
     if (torrent) {
       dispatchDecodeTorrentStory(torrent);
-      logger.info('dispatchDecodeTorrentStory', torrent, location);
       (!(location && location.pathname === routes.COMPLETED)) && dispatch(push(routes.COMPLETED));
     }
   }
 };
 
 export const dispatchDecodeTorrentStory = (torrent) => {
-  const {infoHash} = torrent;
+  const {infoHash, price} = torrent;
 
-  if (!isTorrentToken(torrent && torrent.token)) {
+  if (price > 0 && !isTorrentToken(torrent && torrent.token)) {
     const token = checkTokenByWires(torrent);
     dispatchTorrentAction(getClientTorrent(infoHash), {token});
   }

@@ -3,7 +3,7 @@ import routes from '../../constants/routes';
 import { redirectAfterSetWalletAction } from '../Wallet/actions';
 import checkDiskSpace from 'check-disk-space';
 import trans from '../../translations';
-import { encryptFiles, fileEntitiesSize, writeTorrentFile } from '../../utils/file';
+import { prepareFiles, fileEntitiesSize, writeTorrentFile } from '../../utils/file';
 import { alertConfirmationStory, deleteConfirmationStory } from '../Alerts/story';
 import {
   clearUploadFilesAction,
@@ -61,16 +61,17 @@ export const createUploadTorrentStory = async (dispatch, payload) => {
     const progress = new FilesProgress(files, (payload) => dispatch(generateTorrentProgressAction(payload)));
     dispatch(generateTorrentProgressAction(progress.progress));
 
-    const encryptedFiles = await encryptFiles(files, path, name, token, progress.listener);
+    const preparedFiles = await prepareFiles(files, path, name, token, price > 0, progress.listener);
     progress.destroy();
 
     dispatch(generateTorrentProgressAction());
     dispatch(generateTorrentStatusAction(TS_GENERATION_TORRENT));
 
     const comment = getTorrentComment(name, description, Number(price), owner);
-    const {infoHash, torrentFile, length: size} = await generateTorrentFile(path, encryptedFiles, name, comment, createdAt);
+    const {infoHash, torrentFile, length: size} = await generateTorrentFile(path, preparedFiles, name, comment, createdAt);
     const torrentFilePath = getTorrentFilePath(path, name);
-    writeTorrentFile(torrentFilePath, torrentFile);
+
+    await writeTorrentFile(torrentFilePath, torrentFile);
 
     dispatch(addWebTorrentAction({infoHash, path, name, description, size, price, createdAt, token, owner, type}));
     dispatch(createUploadTorrentAction({createdAt, infoHash}));

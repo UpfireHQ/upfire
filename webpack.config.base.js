@@ -29,6 +29,19 @@ function filterDepWithoutEntryPoints(dep) {
 
 module.exports = {
   externals: [
+    ...[
+      'amcharts3',
+      'ethereumjs-tx',
+      'ethereumjs-util',
+      'ethereumjs-wallet',
+      'sha3',
+      'ssb-ws',
+      'ut_message',
+      'ut_metadata',
+      'ut_pex',
+      'web3',
+      'webtorrent'
+    ],
     ...Object.keys(possibleExternals || {}).filter(filterDepWithoutEntryPoints)
   ],
 

@@ -41,7 +41,7 @@ import {
 import { requestTorrentWiresPassword } from '../../utils/torrent/wire';
 import {
   dispatchDecodeTorrentStory,
-  dispatchTorrentAction
+  dispatchTorrentAction,
 } from '../../utils/torrent/store';
 import {
   getPaymentData,
@@ -51,13 +51,14 @@ import {
 } from '../../utils/torrent/helpers';
 import checkDiskSpace from 'check-disk-space';
 import { FilesProgress } from '../../utils/files-progress';
-import { decryptFiles, FileEntity } from '../../utils/file';
+import { decryptFiles, renameFiles, FileEntity } from '../../utils/file';
 import Path from 'path';
 import { checkBalancesStory } from '../Wallet/story';
 import { percentageOfFee } from '../Wallet/actions';
 import EthClient from '../../blockchain/client';
 import logger from '../../utils/logger';
 import { getETHFee } from '../Wallet/selector';
+import { getState } from '../../store';
 
 export const routeToWalletStory = async dispatch => {
   dispatch(push(routes.WALLET));
@@ -77,10 +78,17 @@ export const initCompletedTorrentsStory = async (dispatch, store) => {
   Array.from(torrents).forEach(({ infoHash }) => {
     const torrent = store[infoHash];
 
-    if (torrent && torrent.payment && !torrent.token) {
-      checkPaymentTransactionStory(dispatch, store[infoHash]).catch(
-        logger.warn
-      );
+    if (torrent) {
+      if (torrent.price === 0 && torrent.infoHash) {
+        const { location } = getState('router');
+
+        dispatchDecodeTorrentStory(torrent);
+        (!(location && location.pathname === routes.COMPLETED)) && dispatch(push(routes.COMPLETED));
+      } else if (torrent.payment && !torrent.token) {
+        checkPaymentTransactionStory(dispatch, store[infoHash]).catch(
+          logger.warn
+        );
+      }
     }
   });
 };
@@ -131,7 +139,7 @@ export const unpackTorrentStory = async (dispatch, payload) => {
     return alertConfirmationStory(dispatch, trans('unpack.failed'));
   }
 
-  if (isTorrentToken(torrent && torrent.token)) {
+  if (torrent.price === 0 || isTorrentToken(torrent && torrent.token)) {
     logger.info('unpackTorrentStory >> isTorrentToken', infoHash);
     return dispatchDecodeTorrentStory(torrent);
   }
@@ -161,10 +169,16 @@ export const unpackTorrentStory = async (dispatch, payload) => {
 
   if (successPayment) {
     dispatch(autoStartUnpackAction(infoHash));
-    return requestTorrentWiresPassword(clientTorrent);
+
+    if (torrent.price > 0) {
+      return requestTorrentWiresPassword(clientTorrent);
+    }
   }
 
-  await dispatch(getGasPriceAction());
+  if (torrent.price > 0) {
+    await dispatch(getGasPriceAction());
+  }
+
   dispatch(setUnpackTorrentStatusAction());
   dispatch(setUnpackTorrentAction(infoHash));
 };
@@ -178,51 +192,53 @@ export const unpackTorrentStory = async (dispatch, payload) => {
 export const startUnpackTorrentStory = async (dispatch, payload) => {
   const { torrent, decodedWallet, gasPrice } = payload;
   const { infoHash, price } = torrent;
-  const address = decodedWallet && decodedWallet.getAddressString();
 
   dispatch(setUnpackTorrentStatusAction(infoHash));
   dispatch(setUnpackTorrentAction());
 
   try {
-    const [availableETHBalance, ethBalance, percentageFee] = await Promise.all([
-      dispatch(balanceOfETHContractTokenAction(address)),
-      dispatch(balanceOfEthAction(address)),
-      dispatch(percentageOfFee())
-    ]).then(([availableETH, eth, fee]) => [
-      (availableETH.value && availableETH.value.balance) || 0,
-      (eth.value && eth.value.balance) || 0,
-      (fee.value && fee.value.percentageFee) || 0
-    ]);
-
-    const fee = getETHFee(percentageFee, price);
-
-    if (
-      Number(availableETHBalance) <
-      Number(EthClient.instance.toWei(fee.plus(new BigNumber(price))))
-    ) {
-      await alertConfirmationStory(dispatch, trans('walletOperations.PayETH'));
-      logger.warn(trans('walletOperations.PayETH'), infoHash);
-      return dispatch(setUnpackTorrentStatusAction());
-    }
-
-    const ethNeed = await EthClient.instance.ethNeed(GAS_LIMIT_MAX, gasPrice);
-
-    if (Number(ethNeed) >= Number(ethBalance)) {
-      await alertConfirmationStory(
-        dispatch,
-        trans('walletOperations.RefillETH')
-      );
-      logger.warn(trans('walletOperations.RefillETH'), infoHash);
-      return dispatch(setUnpackTorrentStatusAction());
-    }
-
-    const gas = {
-      price: gasPrice,
-      limit: GAS_LIMIT_MAX
-    };
-
     const value = {};
+
     if (price > 0) {
+      const address = decodedWallet && decodedWallet.getAddressString();
+
+      const [availableETHBalance, ethBalance, percentageFee] = await Promise.all([
+        dispatch(balanceOfETHContractTokenAction(address)),
+        dispatch(balanceOfEthAction(address)),
+        dispatch(percentageOfFee())
+      ]).then(([availableETH, eth, fee]) => [
+        (availableETH.value && availableETH.value.balance) || 0,
+        (eth.value && eth.value.balance) || 0,
+        (fee.value && fee.value.percentageFee) || 0
+      ]);
+
+      const fee = getETHFee(percentageFee, price);
+
+      if (
+        Number(availableETHBalance) <
+        Number(EthClient.instance.toWei(fee.plus(new BigNumber(price))))
+      ) {
+        await alertConfirmationStory(dispatch, trans('walletOperations.PayETH'));
+        logger.warn(trans('walletOperations.PayETH'), infoHash);
+        return dispatch(setUnpackTorrentStatusAction());
+      }
+
+      const ethNeed = await EthClient.instance.ethNeed(GAS_LIMIT_MAX, gasPrice);
+
+      if (Number(ethNeed) >= Number(ethBalance)) {
+        await alertConfirmationStory(
+          dispatch,
+          trans('walletOperations.RefillETH')
+        );
+        logger.warn(trans('walletOperations.RefillETH'), infoHash);
+        return dispatch(setUnpackTorrentStatusAction());
+      }
+
+      const gas = {
+        price: gasPrice,
+        limit: GAS_LIMIT_MAX
+      };
+
       value.payment = await payTorrent(
         decodedWallet,
         getPaymentData(torrent, percentageFee),
@@ -327,13 +343,13 @@ export const checkPaymentTransactionStory = async (dispatch, payload) => {
 export const decodeTorrentStory = async (dispatch, payload) => {
   const { torrent, unpackTorrentProgress } = payload;
 
-  if (!(torrent && torrent.token)) {
+  if (!torrent || (torrent.price > 0 && !torrent.token)) {
     return dispatch(setUnpackTorrentProgressAction());
   }
 
   dispatch(setUnpackTorrentProgressAction(unpackTorrentProgress));
 
-  const { infoHash, size, token, name } = torrent;
+  const { infoHash, size, token, name, price } = torrent;
   const { path: dest } = unpackTorrentProgress;
   const progress = new FilesProgress();
 
@@ -355,7 +371,7 @@ export const decodeTorrentStory = async (dispatch, payload) => {
     }
 
     const files = clientTorrent.files.map(f => {
-      return new FileEntity(Path.join(clientTorrent.path, f.path));
+      return new FileEntity(f.path);
     });
 
     progress.init(files, progress => {
@@ -373,8 +389,10 @@ export const decodeTorrentStory = async (dispatch, payload) => {
       })
     );
 
-    const res = await decryptFiles(files, dest, name, token, progress.listener);
-    logger.debug('*** decryptFiles', res);
+    const res = price > 0 ?
+      await decryptFiles(files, dest, name, token, progress.listener) :
+      await renameFiles(files, dest, name, progress.listener);
+
     progress.destroy();
 
     const decoded = res && res[0] ? Path.dirname(res[0]) : dest;

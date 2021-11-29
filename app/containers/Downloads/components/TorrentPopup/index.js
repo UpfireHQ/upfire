@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+  import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { PopUpWithBg } from '../../../../components/PopUp';
 import ClosePopUp from '../../../../components/Buttons/ClosePopUpBtn';

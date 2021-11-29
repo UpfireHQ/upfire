@@ -1,8 +1,11 @@
-import { FILE_ENCRYPT_EXTENSION } from '../constants/torrent';
-import { bytesToSize } from './bytesformat';
 import fs from 'fs';
 import path from 'path';
+import { FILE_ENCRYPT_EXTENSION, FILE_FREE_EXTENSION } from '../constants';
+import { bytesToSize } from './bytesformat';
 import * as fileCrypt from './file-crypt';
+import crypto from 'crypto';
+import { ALGORITHMS } from './file-crypt';
+import logger from '../utils/logger';
 
 export class FileEntity {
 
@@ -98,7 +101,7 @@ export const readTorrentFile = (path) => {
  * @param path
  * @param torrentFile
  */
-export const writeTorrentFile = (path, torrentFile) => {
+export const writeTorrentFile = async (path, torrentFile) => {
   fs.writeFileSync(path, torrentFile);
 };
 
@@ -107,7 +110,7 @@ export const writeTorrentFile = (path, torrentFile) => {
 const _destination = (files, destination, name) => {
   if (files.length > 1) {
     destination = path.join(destination, name);
-    
+
     if (!fileExists(destination)) {
       fs.mkdirSync(destination, {recursive: true});
     }
@@ -116,15 +119,34 @@ const _destination = (files, destination, name) => {
   return destination;
 };
 
-export const encryptFiles = async (files, destination, name, password, callback) => {
+const writeFile = async (filepath, destination, callback) => new Promise((resolve, reject) => {
+  if (!fs.lstatSync(filepath).isFile()) {
+    return reject(new Error(`File ${filepath} not found`));
+  }
+
+  return fs.createReadStream(filepath, {flags: 'r+'})
+    .on('data', (data) => (typeof callback === 'function') && callback(filepath, data.length))
+    .pipe(fs.createWriteStream(destination, {flags: 'w+'}))
+    .on('finish', () => {
+      (typeof callback === 'function') && callback(filepath, 0, true);
+      resolve(destination);
+    });
+});
+
+export const prepareFiles = async (files, destination, name, password, encrypt, callback) => {
+  throw new Error('prepare files')
   files = Array.isArray(files) ? files : [files];
   destination = _destination(files, destination, name);
   const result = [];
 
   for (let file of files) {
-    const destFile = path.join(destination, file.name + FILE_ENCRYPT_EXTENSION);
-
-    result.push(await fileCrypt.encrypt(file.path, destFile, password, callback));
+    if (encrypt) {
+      const destFile = path.join(destination, file.name + FILE_ENCRYPT_EXTENSION);
+      result.push(await fileCrypt.encrypt(file.path, destFile, password, callback));
+    } else {
+      const destFile = path.join(destination, file.name + FILE_FREE_EXTENSION);
+      result.push(await writeFile(file.path, destFile, callback));
+    }
   }
 
   return result;
@@ -139,6 +161,20 @@ export const decryptFiles = async (files, destination, name, password, callback)
     const destFile = path.join(destination, path.basename(file.name, FILE_ENCRYPT_EXTENSION));
 
     result.push(await fileCrypt.decrypt(file.path, destFile, password, callback));
+  }
+
+  return result;
+};
+
+export const renameFiles = async (files, destination, name, callback) => {
+  files = Array.isArray(files) ? files : [files];
+  destination = _destination(files, destination, name);
+  const result = [];
+
+  for (let file of files) {
+    const destFile = path.join(destination, path.basename(file.name, FILE_FREE_EXTENSION));
+
+    result.push(await writeFile(file.path, destFile, callback));
   }
 
   return result;
