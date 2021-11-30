@@ -34,4 +34,9 @@ jobs:
         with:
           name: win-build
           path: release/Upfire*.exe
+      - name: Store linux build
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-build
+          path: release/upfire*.deb
 
