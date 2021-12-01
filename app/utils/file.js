@@ -134,7 +134,6 @@ const writeFile = async (filepath, destination, callback) => new Promise((resolv
 });
 
 export const prepareFiles = async (files, destination, name, password, encrypt, callback) => {
-  throw new Error('prepare files')
   files = Array.isArray(files) ? files : [files];
   destination = _destination(files, destination, name);
   const result = [];
