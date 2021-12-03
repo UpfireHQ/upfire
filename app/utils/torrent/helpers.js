@@ -88,7 +88,7 @@ export const getTorrentStats = (torrent = {}) => {
     paused,
     numPeers,
     received,
-    ratio
+    ratio,
   } = torrent;
 
   return {
@@ -201,7 +201,7 @@ export const isTorrentFilesExists = torrent => {
     Boolean(torrent && torrent.files && torrent.files.length) &&
     Array.from(torrent.files).reduce((value, file) => {
       const exist = Boolean(
-        file && fileExists(path.join(torrent.path, file.path))
+        file && fileExists(file.path)
       );
       return exist && value;
     }, true)

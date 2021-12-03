@@ -153,7 +153,6 @@ export const unpackTorrentStory = async (dispatch, payload) => {
     )
   ) {
     clientTorrent.resume();
-    logger.warn('unpackTorrentStory >> isTorrentHasRemoteToken', infoHash);
     return alertConfirmationStory(dispatch, trans('finished.tokenNotFound'));
   }
 
@@ -196,12 +195,12 @@ export const startUnpackTorrentStory = async (dispatch, payload) => {
   dispatch(setUnpackTorrentStatusAction(infoHash));
   dispatch(setUnpackTorrentAction());
 
+  const address = decodedWallet && decodedWallet.getAddressString();
+
   try {
     const value = {};
 
     if (price > 0) {
-      const address = decodedWallet && decodedWallet.getAddressString();
-
       const [availableETHBalance, ethBalance, percentageFee] = await Promise.all([
         dispatch(balanceOfETHContractTokenAction(address)),
         dispatch(balanceOfEthAction(address)),
