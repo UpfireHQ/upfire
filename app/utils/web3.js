@@ -1,5 +1,5 @@
 import Wallet from 'ethereumjs-wallet';
-import EthUtil from 'ethereumjs-util';
+import * as EthUtil from 'ethereumjs-util';
 import logger from './logger';
 
 export const V3options = {
