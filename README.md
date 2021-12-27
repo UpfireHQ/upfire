@@ -1,6 +1,6 @@
 # Upfire
 
-Upfire is the first-ever decentralized P2P file-sharing platform. Our project is now open source, and anyone can contribute to development.
+Upfire is the first-ever decentralized P2P file-sharing platform. Our project is open source and anyone can contribute to development.
 
 ## Purpose
 
