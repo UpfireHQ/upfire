@@ -12,3 +12,10 @@ The main goal of this decentralized application is to enable users to directly e
 2. Do your changes and create a pull request.
 3. When the pull request is merged into the main branch, the dapp will be built on Github.
 4. Find the builds [here](https://github.com/UpfireHQ/upfire/actions).
+
+## How to run the app in dev mode? 
+
+1. Clone the repository.
+2. Install dependencies via `yarn`.
+3. Start the renderer thread in another terminal session via `yarn start-renderer-dev`.   
+4. Start the main thread in one terminal session via `yarn start-main-dev`.
