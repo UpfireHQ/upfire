@@ -19,3 +19,12 @@ The main goal of this decentralized application is to enable users to directly e
 2. Install dependencies via `yarn`.
 3. Start the renderer thread in another terminal session via `yarn start-renderer-dev`.   
 4. Start the main thread in one terminal session via `yarn start-main-dev`.
+
+## Staking Contract
+
+1. To deploy the staking contract switch to the `blockchain` directory with `cd blockchain`. 
+2. Now install dependencies with `npm install`.
+3. If you want to deploy staking to BSC testnet you need a private key for a wallet with BNB balance. Store the private key in a `BSC_PRIVATE_KEY` env variable.
+4. Run `npx hardhat deployStaking --network bsctest` and the staking contract will be deployed to testnet.
+
+How does the contract work? The test case `blockchain/test/UpfireStaking.js` shows how to interact.

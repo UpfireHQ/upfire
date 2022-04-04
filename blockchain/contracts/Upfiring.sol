@@ -57,41 +57,41 @@ contract Upfiring is Initializable, OwnableUpgradeable {
     }
 
     function totalReceivingOf(address _owner)
-        public
-        view
-        returns (uint256 balance)
+    public
+    view
+    returns (uint256 balance)
     {
         return store.totalReceivingOf(_owner);
     }
 
     function totalSpendingOf(address _owner)
-        public
-        view
-        returns (uint256 balance)
+    public
+    view
+    returns (uint256 balance)
     {
         return store.totalSpendingOf(_owner);
     }
 
     function check(string memory _torrent, address _from)
-        public
-        view
-        returns (uint256 amount)
+    public
+    view
+    returns (uint256 amount)
     {
         return
-            store.check(torrentToHash(_torrent), _from, availablePaymentTime);
+        store.check(torrentToHash(_torrent), _from, availablePaymentTime);
     }
 
     function torrentToHash(string memory _torrent)
-        internal
-        pure
-        returns (bytes32 _hash)
+    internal
+    pure
+    returns (bytes32 _hash)
     {
         return sha256(bytes(_torrent));
     }
 
     function transferFeeToStaking(uint256 amount) internal {
         if (address(staking) != address(0) && amount > 0) {
-            staking.addRewards(amount);
+            payable(address(staking)).transfer(amount);
         }
     }
 
@@ -151,7 +151,7 @@ contract Upfiring is Initializable, OwnableUpgradeable {
             uint256 _otherAmount = _amount.sub(_ownerAmount);
 
             uint256 _realOtherAmount =
-                shareSeeders(_seeders, _freeSeeders, _otherAmount, _hash);
+            shareSeeders(_seeders, _freeSeeders, _otherAmount, _hash);
             payTo(_owner, _amount.sub(_realOtherAmount), _hash);
         }
     }
@@ -163,7 +163,7 @@ contract Upfiring is Initializable, OwnableUpgradeable {
         bytes32 _hash
     ) internal returns (uint256) {
         uint256 _dLength =
-            _freeSeeders.length.add(_seeders.length.mul(seedersProfitMargin));
+        _freeSeeders.length.add(_seeders.length.mul(seedersProfitMargin));
         uint256 _dAmount = _amount.div(_dLength);
 
         payToList(_seeders, _dAmount.mul(seedersProfitMargin), _hash);
@@ -200,22 +200,22 @@ contract Upfiring is Initializable, OwnableUpgradeable {
     }
 
     function setAvailablePaymentTime(uint256 _availablePaymentTime)
-        public
-        onlyOwner
+    public
+    onlyOwner
     {
         availablePaymentTime = _availablePaymentTime;
     }
 
     function setSeedersProfitMargin(uint8 _seedersProfitMargin)
-        public
-        onlyOwner
+    public
+    onlyOwner
     {
         seedersProfitMargin = _seedersProfitMargin;
     }
 
     function setTorrentOwnerPercent(uint8 _torrentOwnerPercent)
-        public
-        onlyOwner
+    public
+    onlyOwner
     {
         torrentOwnerPercent = _torrentOwnerPercent;
     }

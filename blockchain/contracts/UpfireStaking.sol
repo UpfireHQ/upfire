@@ -76,16 +76,21 @@ contract UpfireStaking is Initializable, OwnableUpgradeable {
 
         uint256 accumulated =
             (staker.amount * accRewardPerShare) / DIV_PRECISION;
-        uint256 reward = accumulated - staker.rewardDebt;
+        uint256 reward = 0;
+
+        if (accumulated > staker.rewardDebt) {
+            reward = accumulated - staker.rewardDebt;
+        }
 
         // also reset the global props
         totalStakedAmount = totalStakedAmount - staker.amount;
 
+        payable(msg.sender).transfer(reward);
+        token.safeTransfer(msg.sender, staker.amount);
+
         // reset all staker props
         staker.rewardDebt = 0;
         staker.amount = 0;
-
-        token.safeTransfer(msg.sender, reward + staker.amount);
 
         emit Harvest(msg.sender, reward);
         emit Withdraw(msg.sender, staker.amount);
@@ -105,13 +110,6 @@ contract UpfireStaking is Initializable, OwnableUpgradeable {
         }
     }
 
-    function addRewards(uint256 amount) external {
-        require(amount > 0, 'StakingPool: Amount must be greater than zero');
-        token.safeTransferFrom(msg.sender, address(this), amount);
-        totalRewardAmount = totalRewardAmount + amount;
-        emit AddRewards(amount);
-    }
-
     function harvest() external {
         StakerInfo storage staker = stakes[msg.sender];
         require(staker.account != address(0), 'StakingPool: No staker exists');
@@ -120,10 +118,15 @@ contract UpfireStaking is Initializable, OwnableUpgradeable {
 
         uint256 accumulated =
             (staker.amount * accRewardPerShare) / DIV_PRECISION;
-        uint256 reward = uint256(accumulated - staker.rewardDebt);
+
+        uint256 reward = 0;
+        if (accumulated > staker.rewardDebt) {
+            reward = accumulated - staker.rewardDebt;
+        }
+        require(reward > 0, 'StakingPool: No reward');
         staker.rewardDebt = accumulated;
 
-        token.safeTransfer(msg.sender, reward);
+        payable(staker.account).transfer(reward);
         emit Harvest(msg.sender, reward);
     }
 
@@ -144,6 +147,17 @@ contract UpfireStaking is Initializable, OwnableUpgradeable {
 
         uint256 accumulated =
             (staker.amount * _accRewardPerShare) / DIV_PRECISION;
-        return uint256(accumulated - staker.rewardDebt);
+
+        if (accumulated < staker.rewardDebt) {
+            return 0;
+        }
+
+        return accumulated - staker.rewardDebt;
+    }
+
+    fallback () external payable {
+        require(msg.value > 0, 'StakingPool: Amount must be greater than zero');
+        totalRewardAmount = totalRewardAmount + msg.value;
+        emit AddRewards(msg.value);
     }
 }
